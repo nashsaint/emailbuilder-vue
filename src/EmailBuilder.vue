@@ -64,7 +64,7 @@
 <script setup>
 import './styles.css'
 import { reactive, computed, watch, ref } from 'vue'
-import { BLOCKS, newBlock } from './blocks.js'
+import { BLOCKS, newBlock } from './block.js'
 import { renderDivTree } from './renderers/htmlDivRenderer.js'
 
 const props = defineProps({
