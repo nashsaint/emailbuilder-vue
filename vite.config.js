@@ -11,9 +11,16 @@ export default defineConfig({
             formats: ['es'],
             fileName: (format) => `emailbuilder.${format}.js`,
         },
+        cssCodeSplit: false,
         rollupOptions: {
             external: ['vue'],
-            output: { globals: { vue: 'Vue' } },
+            output: { 
+                globals: { vue: 'Vue' },
+                assetFileNames: (asset) => {
+                    if (asset.name && asset.name.endsWith('.css')) return 'emailbuilder.css'
+                    return 'assets/[name][extname]'
+                },
+            },
         },
     },
 })

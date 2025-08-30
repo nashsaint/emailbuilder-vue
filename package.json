@@ -10,7 +10,9 @@
     "exports": {
         ".": {
             "import": "./dist/emailbuilder.es.js"
-        }
+        },
+        "./dist/*": "./dist/*",
+        "./style.css": "./dist/emailbuilder.css"
     },
     "files": [
         "dist",

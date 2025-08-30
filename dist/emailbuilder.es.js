@@ -116,10 +116,19 @@ const ne = { class: "eb" }, oe = { class: "toolbar" }, ae = { class: "canvas" },
       }
     });
     const y = $(null), p = $(null), v = $(-1);
+    function T(e, t) {
+      p.value = { type: "lib", data: e }, t.dataTransfer.effectAllowed = "copy", t.dataTransfer.setData("text/plain", `lib:${e}`);
+    }
+    function U(e, t) {
+      p.value = { type: "block", data: e }, y.value = e.id, t.dataTransfer.effectAllowed = "move", t.dataTransfer.setData("text/plain", `block:${e.id}`);
+    }
+    function V() {
+      y.value = null, p.value = null, v.value = -1;
+    }
     function f(e) {
       l.push(L(e)), a("update:modelValue", l);
     }
-    function U(e) {
+    function S(e) {
       l.splice(e, 1), a("update:modelValue", l);
     }
     function D(e, t) {
@@ -128,29 +137,23 @@ const ne = { class: "eb" }, oe = { class: "toolbar" }, ae = { class: "canvas" },
       const [s] = l.splice(e, 1);
       l.splice(n, 0, s), a("update:modelValue", l);
     }
-    function V(e) {
+    function E(e) {
       var t;
       return ((t = w[e]) == null ? void 0 : t.label) || e;
     }
-    function S(e) {
+    function j(e) {
       return e.type === "heading" ? `${e.text}` : e.type === "paragraph" ? `${e.text.slice(0, 40)}…` : e.type === "image" ? `${e.src}` : e.type === "button" ? `${e.text} → ${e.url}` : e.type === "divider" ? `line ${e.thickness}px` : e.type === "spacer" ? `${e.height}px` : e.type === "columns2" ? "two columns" : "";
     }
     const x = $(null);
-    function T(e) {
+    function H(e) {
       x.value = e;
     }
-    function E(e, t) {
-      p.value = { type: "lib", data: e }, t.dataTransfer.effectAllowed = "copy";
-    }
-    function j(e, t) {
-      p.value = { type: "block", data: e }, y.value = e.id, t.dataTransfer.effectAllowed = "move";
-    }
-    function H(e) {
+    function O(e) {
       var d, _;
       const t = ((_ = (d = e.target.closest(".dropzone")) == null ? void 0 : d.getBoundingClientRect()) == null ? void 0 : _.top) ?? 0, n = e.clientY - t, s = Math.max(0, Math.min(l.length, Math.floor(n / 60)));
       v.value = s;
     }
-    function O() {
+    function R() {
       if (!p.value) return;
       const { type: e, data: t } = p.value;
       if (e === "lib")
@@ -163,9 +166,6 @@ const ne = { class: "eb" }, oe = { class: "toolbar" }, ae = { class: "canvas" },
         }
       }
       y.value = null, p.value = null, v.value = -1, a("update:modelValue", l);
-    }
-    function R() {
-      y.value = null, p.value = null, v.value = -1;
     }
     const M = {
       props: ["model"],
@@ -279,7 +279,7 @@ const ne = { class: "eb" }, oe = { class: "toolbar" }, ae = { class: "canvas" },
               key: s,
               class: "block",
               draggable: "",
-              onDragstart: (d) => E(s, d)
+              onDragstart: (d) => T(s, d)
             }, k(n.label), 41, re))), 128))
           ])
         ]),
@@ -288,20 +288,20 @@ const ne = { class: "eb" }, oe = { class: "toolbar" }, ae = { class: "canvas" },
           o("div", pe, [
             o("div", {
               class: "dropzone",
-              onDragover: h(H, ["prevent"]),
-              onDrop: h(O, ["prevent"])
+              onDragover: h(O, ["prevent"]),
+              onDrop: h(R, ["prevent"])
             }, [
               l.length === 0 ? (u(), c("p", ue, "Drag blocks here… or use the toolbar.")) : A("", !0),
               (u(!0), c(I, null, B(l, (n, s) => (u(), c("div", {
                 key: n.id,
                 class: X(["block", { dragging: y.value === n.id }]),
                 draggable: "",
-                onDragstart: (d) => j(n, d),
-                onDragend: R,
-                onClick: (d) => T(n)
+                onDragstart: (d) => U(n, d),
+                onDragend: V,
+                onClick: (d) => H(n)
               }, [
-                o("strong", me, k(V(n.type)), 1),
-                o("small", ge, k(S(n)), 1),
+                o("strong", me, k(E(n.type)), 1),
+                o("small", ge, k(j(n)), 1),
                 o("div", ve, [
                   o("button", {
                     class: "btn",
@@ -315,7 +315,7 @@ const ne = { class: "eb" }, oe = { class: "toolbar" }, ae = { class: "canvas" },
                   }, "↓", 8, ye),
                   o("button", {
                     class: "btn",
-                    onClick: h((d) => U(s), ["stop"])
+                    onClick: h((d) => S(s), ["stop"])
                   }, "✕", 8, he)
                 ])
               ], 42, ce))), 128)),

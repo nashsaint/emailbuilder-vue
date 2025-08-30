@@ -62,7 +62,7 @@
 </template>
 
 <script setup>
-import './styles.css'
+import './emailbuilder.css'
 import { reactive, computed, watch, ref } from 'vue'
 import { BLOCKS, newBlock } from './block.js'
 import { renderDivTree } from './renderers/htmlDivRenderer.js'
@@ -76,10 +76,84 @@ const emit = defineEmits(['update:modelValue', 'export'])
 const tree = reactive(props.modelValue)
 watch(() => props.modelValue, v => { if (v !== tree) { while (tree.length) tree.pop(); tree.push(...v) } })
 
-// drag state
-const draggingId = ref(null)
-const dragPayload = ref(null) // { type: 'lib'|'block', data }
-const ghostIndex = ref(-1)
+// --- Drag & Drop state ---
+const draggingId = ref(null)               // id of a block while dragging
+const dragPayload = ref(null)              // { type: 'lib'|'block', data }
+const ghostIndex = ref(-1)                 // insertion index preview
+
+// Compute insertion index from pointer Y vs block midpoints
+function indexFromPointer(dropzoneEl, clientY) {
+  const blocks = Array.from(dropzoneEl.querySelectorAll(':scope > .block'))
+  if (!blocks.length) return 0
+  for (let i = 0; i < blocks.length; i++) {
+    const r = blocks[i].getBoundingClientRect()
+    const mid = r.top + r.height / 2
+    if (clientY < mid) return i
+  }
+  return blocks.length
+}
+
+// Library item drag start (left panel)
+function onLibDragStart(type, ev) {
+  dragPayload.value = { type: 'lib', data: type }
+  ev.dataTransfer.effectAllowed = 'copy'
+  // Required by Firefox/Safari to initiate DnD
+  ev.dataTransfer.setData('text/plain', `lib:${type}`)
+}
+
+// Existing block drag start (on canvas)
+function onBlockDragStart(block, ev) {
+  dragPayload.value = { type: 'block', data: block }
+  draggingId.value = block.id
+  ev.dataTransfer.effectAllowed = 'move'
+  ev.dataTransfer.setData('text/plain', `block:${block.id}`)
+}
+
+// Canvas events
+function onCanvasDragOver(ev) {
+  const dz = ev.currentTarget
+  ghostIndex.value = indexFromPointer(dz, ev.clientY)
+}
+
+function onCanvasDragLeave(ev) {
+  const related = ev.relatedTarget
+  const dz = ev.currentTarget
+  if (!dz.contains(related)) {
+    ghostIndex.value = -1
+  }
+}
+
+function onCanvasDrop(ev) {
+  const idx = ghostIndex.value < 0 ? tree.length : ghostIndex.value
+  const payload = dragPayload.value
+  if (!payload) return
+
+  if (payload.type === 'lib') {
+    const type = payload.data
+    const b = newBlock(type)
+    tree.splice(idx, 0, b)
+  } else if (payload.type === 'block') {
+    const block = payload.data
+    const from = tree.findIndex(x => x.id === block.id)
+    if (from !== -1) {
+      const [item] = tree.splice(from, 1)
+      const to = from < idx ? idx - 1 : idx
+      tree.splice(to, 0, item)
+    }
+  }
+
+  emit('update:modelValue', tree)
+  // cleanup
+  ghostIndex.value = -1
+  draggingId.value = null
+  dragPayload.value = null
+}
+
+function onDragEnd() {
+  draggingId.value = null
+  dragPayload.value = null
+  ghostIndex.value = -1
+}
 
 function addBlock(type) {
   tree.push(newBlock(type))
@@ -110,16 +184,6 @@ function summarize(b) {
 const selected = ref(null)
 function select(b) { selected.value = b }
 
-// HTML5 drag & drop (no deps)
-function onLibDragStart(type, ev) {
-  dragPayload.value = { type: 'lib', data: type }
-  ev.dataTransfer.effectAllowed = 'copy'
-}
-function onBlockDragStart(block, ev) {
-  dragPayload.value = { type: 'block', data: block }
-  draggingId.value = block.id
-  ev.dataTransfer.effectAllowed = 'move'
-}
 function onDragOver(ev) {
   const y = ev.target.closest('.dropzone')?.getBoundingClientRect()?.top ?? 0
   const offsetY = ev.clientY - y
@@ -145,7 +209,6 @@ function onDropOnCanvas() {
   ghostIndex.value = -1
   emit('update:modelValue', tree)
 }
-function onDragEnd() { draggingId.value = null; dragPayload.value = null; ghostIndex.value = -1 }
 
 // Inspector registry (inline components for simplicity)
 const InspectorHeading = {
