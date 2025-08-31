@@ -1,5 +1,14 @@
-import { reactive as Z, watch as J, ref as $, createElementBlock as c, openBlock as u, createElementVNode as o, Fragment as I, renderList as B, unref as Q, toDisplayString as k, withModifiers as h, createCommentVNode as A, normalizeClass as X, createBlock as ee, resolveDynamicComponent as te } from "vue";
-const w = {
+import { reactive as J, watch as W, ref as k, createElementBlock as c, openBlock as p, createElementVNode as l, Fragment as $, renderList as S, unref as Y, toDisplayString as D, withModifiers as f, createCommentVNode as C, normalizeClass as G, createBlock as K, resolveDynamicComponent as Z } from "vue";
+function Q() {
+  return typeof crypto < "u" && crypto.randomUUID ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (s) => {
+    const i = Math.random() * 16 | 0;
+    return (s === "x" ? i : i & 3 | 8).toString(16);
+  });
+}
+function X(s) {
+  return typeof structuredClone == "function" ? structuredClone(s) : JSON.parse(JSON.stringify(s));
+}
+const T = {
   heading: {
     label: "Heading",
     defaults: { text: "Your Heading", level: 2, align: "left" }
@@ -29,32 +38,36 @@ const w = {
     defaults: { gap: 16, cols: [{ blocks: [] }, { blocks: [] }] }
   }
 };
-function L(r) {
-  const i = w[r];
-  if (!i) throw new Error(`Unknown block: ${r}`);
-  return { id: crypto.randomUUID(), type: r, ...structuredClone(i.defaults) };
+function _(s) {
+  const i = T[s];
+  if (!i) throw new Error(`Unknown block: ${s}`);
+  return {
+    id: Q(),
+    type: s,
+    ...X(i.defaults)
+  };
 }
-function m(r = {}) {
-  return Object.entries(r).filter(([, i]) => i != null && i !== "").map(([i, g]) => `${i.replace(/([A-Z])/g, "-$1").toLowerCase()}:${g}`).join(";");
+function x(s = {}) {
+  return Object.entries(s).filter(([, i]) => i != null && i !== "").map(([i, v]) => `${i.replace(/([A-Z])/g, "-$1").toLowerCase()}:${v}`).join(";");
 }
-function le(r) {
+function ee(s) {
   const i = [
     "<!doctype html>",
     '<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">',
     '<title>Email</title></head><body style="margin:0;padding:0;background:#f5f5f5;">',
     '<div style="max-width:640px;margin:0 auto;padding:16px;background:#ffffff;">'
-  ], g = (a) => {
+  ], v = (a) => {
     switch (a.type) {
       case "heading": {
-        const l = `h${a.level || 2}`;
-        return `<${l} style="${m({ textAlign: a.align, margin: "0 0 12px" })}">${b(a.text)}</${l}>`;
+        const n = `h${a.level || 2}`;
+        return `<${n} style="${x({ textAlign: a.align, margin: "0 0 12px" })}">${I(a.text)}</${n}>`;
       }
       case "paragraph":
-        return `<p style="${m({ textAlign: a.align, margin: "0 0 12px", lineHeight: "1.5" })}">${b(a.text)}</p>`;
+        return `<p style="${x({ textAlign: a.align, margin: "0 0 12px", lineHeight: "1.5" })}">${I(a.text)}</p>`;
       case "image":
-        return `<img src="${C(a.src)}" alt="${C(a.alt)}" style="${m({ width: a.width || "100%", height: "auto", display: "block", margin: "0 0 12px" })}"/>`;
+        return `<img src="${w(a.src)}" alt="${w(a.alt)}" style="${x({ width: a.width || "100%", height: "auto", display: "block", margin: "0 0 12px" })}"/>`;
       case "button": {
-        const l = m({
+        const n = x({
           display: "inline-block",
           background: "#111827",
           color: "#ffffff",
@@ -64,42 +77,45 @@ function le(r) {
           textAlign: "center",
           margin: "0 0 12px"
         });
-        return `<div style="${m({ textAlign: a.align })}"><a href="${C(a.url)}" style="${l}">${b(a.text)}</a></div>`;
+        return `<div style="${x({ textAlign: a.align })}"><a href="${w(a.url)}" style="${n}">${I(a.text)}</a></div>`;
       }
       case "divider":
-        return `<hr style="${m({ border: 0, height: `${a.thickness || 1}px`, background: a.color || "#e5e7eb", margin: "12px 0" })}">`;
+        return `<hr style="${x({ border: 0, height: `${a.thickness || 1}px`, background: a.color || "#e5e7eb", margin: "12px 0" })}">`;
       case "spacer":
-        return `<div style="${m({ height: `${a.height || 16}px` })}"></div>`;
+        return `<div style="${x({ height: `${a.height || 16}px` })}"></div>`;
       case "columns2": {
-        const l = a.gap ?? 16, y = (p) => `<div style="${m({ flex: "1 1 0" })}">${p.map(g).join("")}</div>`;
-        return `<div style="${m({ display: "flex", gap: `${l}px`, margin: "0 0 12px" })}">${a.cols.map((p) => y(p.blocks || [])).join("")}</div>`;
+        const n = a.gap ?? 16, y = (u) => `<div style="${x({ flex: "1 1 0" })}">${u.map(v).join("")}</div>`;
+        return `<div style="${x({ display: "flex", gap: `${n}px`, margin: "0 0 12px" })}">${a.cols.map((u) => y(u.blocks || [])).join("")}</div>`;
       }
       default:
         return "";
     }
   };
-  for (const a of r) i.push(g(a));
+  for (const a of s) i.push(v(a));
   return i.push("</div></body></html>"), i.join("");
 }
-function b(r = "") {
-  return r.replace(/[&<>]/g, (i) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[i]);
+function I(s = "") {
+  return s.replace(/[&<>]/g, (i) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[i]);
 }
-function C(r = "") {
-  return r.replace(/["&<>]/g, (i) => ({ '"': "&quot;", "&": "&amp;", "<": "&lt;", ">": "&gt;" })[i]);
+function w(s = "") {
+  return s.replace(/["&<>]/g, (i) => ({ '"': "&quot;", "&": "&amp;", "<": "&lt;", ">": "&gt;" })[i]);
 }
-const ne = { class: "eb" }, oe = { class: "toolbar" }, ae = { class: "canvas" }, ie = { class: "panel" }, se = { class: "body" }, re = ["onDragstart"], de = { class: "panel" }, pe = { class: "body" }, ue = {
+const te = { class: "eb" }, ne = { class: "toolbar" }, le = { class: "canvas" }, oe = { class: "panel" }, ae = { class: "body" }, ie = ["onDragstart"], re = { class: "panel" }, se = { class: "body" }, de = {
   key: 0,
-  style: { opacity: ".7" }
-}, ce = ["onDragstart", "onClick"], me = { style: { display: "block", "margin-bottom": ".25rem" } }, ge = { style: { opacity: ".7" } }, ve = { class: "controls" }, fe = ["onClick", "disabled"], ye = ["onClick", "disabled"], he = ["onClick"], xe = {
+  class: "ghost"
+}, pe = {
+  key: 0,
+  class: "ghost"
+}, ue = ["onDragstart", "onDragover", "onMousedown", "onClick"], ce = { style: { display: "block", "margin-bottom": ".25rem" } }, me = { style: { opacity: ".7" } }, ge = ["onClick", "disabled"], ve = ["onClick", "disabled"], fe = ["onClick"], xe = {
   key: 1,
   class: "ghost"
-}, $e = { class: "panel" }, ke = {
+}, be = { class: "panel" }, ye = {
   key: 0,
   class: "body"
-}, be = {
+}, he = {
   key: 1,
   class: "body"
-}, we = {
+}, Ae = {
   __name: "EmailBuilder",
   props: {
     modelValue: { type: Array, default: () => [] },
@@ -107,237 +123,275 @@ const ne = { class: "eb" }, oe = { class: "toolbar" }, ae = { class: "canvas" },
     // 'div' | 'table' (future)
   },
   emits: ["update:modelValue", "export"],
-  setup(r, { emit: i }) {
-    const g = r, a = i, l = Z(g.modelValue);
-    J(() => g.modelValue, (e) => {
-      if (e !== l) {
-        for (; l.length; ) l.pop();
-        l.push(...e);
-      }
-    });
-    const y = $(null), p = $(null), v = $(-1);
-    function T(e, t) {
-      p.value = { type: "lib", data: e }, t.dataTransfer.effectAllowed = "copy", t.dataTransfer.setData("text/plain", `lib:${e}`);
-    }
-    function U(e, t) {
-      p.value = { type: "block", data: e }, y.value = e.id, t.dataTransfer.effectAllowed = "move", t.dataTransfer.setData("text/plain", `block:${e.id}`);
-    }
-    function V() {
-      y.value = null, p.value = null, v.value = -1;
-    }
-    function f(e) {
-      l.push(L(e)), a("update:modelValue", l);
-    }
-    function S(e) {
-      l.splice(e, 1), a("update:modelValue", l);
-    }
-    function D(e, t) {
-      const n = e + t;
-      if (n < 0 || n >= l.length) return;
-      const [s] = l.splice(e, 1);
-      l.splice(n, 0, s), a("update:modelValue", l);
-    }
-    function E(e) {
-      var t;
-      return ((t = w[e]) == null ? void 0 : t.label) || e;
-    }
-    function j(e) {
-      return e.type === "heading" ? `${e.text}` : e.type === "paragraph" ? `${e.text.slice(0, 40)}…` : e.type === "image" ? `${e.src}` : e.type === "button" ? `${e.text} → ${e.url}` : e.type === "divider" ? `line ${e.thickness}px` : e.type === "spacer" ? `${e.height}px` : e.type === "columns2" ? "two columns" : "";
-    }
-    const x = $(null);
-    function H(e) {
-      x.value = e;
-    }
-    function O(e) {
-      var d, _;
-      const t = ((_ = (d = e.target.closest(".dropzone")) == null ? void 0 : d.getBoundingClientRect()) == null ? void 0 : _.top) ?? 0, n = e.clientY - t, s = Math.max(0, Math.min(l.length, Math.floor(n / 60)));
-      v.value = s;
-    }
-    function R() {
-      if (!p.value) return;
-      const { type: e, data: t } = p.value;
-      if (e === "lib")
-        l.splice(v.value === -1 ? l.length : v.value, 0, L(t));
-      else if (e === "block") {
-        const n = l.findIndex((s) => s.id === t.id);
-        if (n !== -1) {
-          const [s] = l.splice(n, 1), d = v.value === -1 ? l.length : v.value;
-          l.splice(d, 0, s);
+  setup(s, { emit: i }) {
+    const v = s, a = i, n = J(v.modelValue);
+    W(
+      () => v.modelValue,
+      (t) => {
+        if (t !== n) {
+          for (; n.length; ) n.pop();
+          n.push(...t);
         }
       }
-      y.value = null, p.value = null, v.value = -1, a("update:modelValue", l);
+    );
+    const y = k(null), u = k(null), m = k(-1);
+    function L(t, e) {
+      var d;
+      const r = e.currentTarget.getBoundingClientRect(), o = r.top + r.height / 2;
+      m.value = e.clientY < o ? t : t + 1, e.dataTransfer && (e.dataTransfer.dropEffect = ((d = u.value) == null ? void 0 : d.type) === "block" ? "move" : "copy");
     }
-    const M = {
-      props: ["model"],
-      emits: ["update"],
-      template: `<div>
+    function U(t) {
+      var o;
+      t.dataTransfer && (t.dataTransfer.dropEffect = ((o = u.value) == null ? void 0 : o.type) === "block" ? "move" : "copy");
+      const e = t.currentTarget, r = Array.from(e.querySelectorAll(":scope > .block"));
+      m.value = r.length ? n.length : 0;
+    }
+    function E(t) {
+      const e = t.relatedTarget;
+      t.currentTarget.contains(e) || (m.value = -1);
+    }
+    function V(t, e) {
+      u.value = { type: "lib", data: t }, e.dataTransfer.effectAllowed = "copy", e.dataTransfer.setData("text/plain", `lib:${t}`);
+    }
+    function O(t, e) {
+      u.value = { type: "block", data: t }, y.value = t.id, e.dataTransfer.effectAllowed = "move", e.dataTransfer.setData("text/plain", `block:${t.id}`);
+    }
+    function H() {
+      const t = m.value < 0 ? n.length : m.value, e = u.value;
+      if (e) {
+        if (e.type === "lib")
+          n.splice(t, 0, _(e.data));
+        else if (e.type === "block") {
+          const r = n.findIndex((o) => o.id === e.data.id);
+          if (r !== -1) {
+            const [o] = n.splice(r, 1), d = r < t ? t - 1 : t;
+            n.splice(d, 0, o);
+          }
+        }
+        a("update:modelValue", n), m.value = -1, y.value = null, u.value = null;
+      }
+    }
+    function R() {
+      y.value = null, u.value = null, m.value = -1;
+    }
+    function b(t) {
+      n.push(_(t)), a("update:modelValue", n);
+    }
+    function j(t) {
+      n.splice(t, 1), a("update:modelValue", n);
+    }
+    function B(t, e) {
+      const r = t + e;
+      if (r < 0 || r >= n.length) return;
+      const [o] = n.splice(t, 1);
+      n.splice(r, 0, o), a("update:modelValue", n);
+    }
+    function M(t) {
+      var e;
+      return ((e = T[t]) == null ? void 0 : e.label) || t;
+    }
+    function z(t) {
+      return t.type === "heading" ? t.text : t.type === "paragraph" ? `${t.text.slice(0, 40)}…` : t.type === "image" ? t.src : t.type === "button" ? `${t.text} → ${t.url}` : t.type === "divider" ? `line ${t.thickness}px` : t.type === "spacer" ? `${t.height}px` : t.type === "columns2" ? "two columns" : "";
+    }
+    const h = k(null);
+    function A(t) {
+      h.value = t;
+    }
+    const N = {
+      heading: {
+        props: ["model"],
+        emits: ["update"],
+        template: `<div>
     <label>Text</label><input type="text" v-model="model.text" @input="$emit('update')">
     <label>Level</label><input type="text" v-model.number="model.level" @input="$emit('update')">
     <label>Align</label><input type="text" v-model="model.align" @input="$emit('update')">
   </div>`
-    }, z = {
-      props: ["model"],
-      emits: ["update"],
-      template: `<div>
+      },
+      paragraph: {
+        props: ["model"],
+        emits: ["update"],
+        template: `<div>
     <label>Text</label><textarea rows="6" v-model="model.text" @input="$emit('update')"></textarea>
     <label>Align</label><input type="text" v-model="model.align" @input="$emit('update')">
   </div>`
-    }, P = {
-      props: ["model"],
-      emits: ["update"],
-      template: `<div>
+      },
+      image: {
+        props: ["model"],
+        emits: ["update"],
+        template: `<div>
     <label>URL</label><input type="url" v-model="model.src" @input="$emit('update')">
     <label>Alt</label><input type="text" v-model="model.alt" @input="$emit('update')">
     <label>Width</label><input type="text" v-model="model.width" @input="$emit('update')">
   </div>`
-    }, Y = {
-      props: ["model"],
-      emits: ["update"],
-      template: `<div>
+      },
+      button: {
+        props: ["model"],
+        emits: ["update"],
+        template: `<div>
     <label>Text</label><input type="text" v-model="model.text" @input="$emit('update')">
     <label>URL</label><input type="url" v-model="model.url" @input="$emit('update')">
     <label>Align</label><input type="text" v-model="model.align" @input="$emit('update')">
   </div>`
-    }, F = {
-      props: ["model"],
-      emits: ["update"],
-      template: `<div>
-  <label>Thickness</label><input type="text" v-model.number="model.thickness" @input="$emit('update')">
-  <label>Color</label><input type="text" v-model="model.color" @input="$emit('update')">
-</div>`
-    }, N = {
-      props: ["model"],
-      emits: ["update"],
-      template: `<div>
-  <label>Height (px)</label><input type="text" v-model.number="model.height" @input="$emit('update')">
-</div>`
-    }, W = {
-      props: ["model"],
-      emits: ["update"],
-      template: `<div>
-  <label>Gap (px)</label><input type="text" v-model.number="model.gap" @input="$emit('update')">
-  <p style="opacity:.7">Open to extend: nested column editors.</p>
-</div>`
-    };
-    function q(e) {
-      return (e == null ? void 0 : e.type) === "heading" ? M : (e == null ? void 0 : e.type) === "paragraph" ? z : (e == null ? void 0 : e.type) === "image" ? P : (e == null ? void 0 : e.type) === "button" ? Y : (e == null ? void 0 : e.type) === "divider" ? F : (e == null ? void 0 : e.type) === "spacer" ? N : (e == null ? void 0 : e.type) === "columns2" ? W : { template: "<div>Unsupported block.</div>" };
+      },
+      divider: {
+        props: ["model"],
+        emits: ["update"],
+        template: `<div>
+    <label>Thickness</label><input type="text" v-model.number="model.thickness" @input="$emit('update')">
+    <label>Color</label><input type="text" v-model="model.color" @input="$emit('update')">
+  </div>`
+      },
+      spacer: {
+        props: ["model"],
+        emits: ["update"],
+        template: `<div>
+    <label>Height (px)</label><input type="text" v-model.number="model.height" @input="$emit('update')">
+  </div>`
+      },
+      columns2: {
+        props: ["model"],
+        emits: ["update"],
+        template: `<div>
+    <label>Gap (px)</label><input type="text" v-model.number="model.gap" @input="$emit('update')">
+    <p style="opacity:.7">Open to extend: nested column editors.</p>
+  </div>`
+      }
+    }, P = { template: '<div style="opacity:.7">No inspector for this block.</div>' };
+    function q() {
+      console.log(3);
     }
-    function G() {
-      a("update:modelValue", l);
+    function F() {
+      const t = ee(n);
+      a("export", { html: t, format: v.renderer });
+      const e = new Blob([t], { type: "text/html" }), r = URL.createObjectURL(e);
+      window.open(r, "_blank"), setTimeout(() => URL.revokeObjectURL(r), 1e4);
     }
-    function K() {
-      const e = le(l);
-      a("export", { html: e, format: g.renderer });
-      const t = new Blob([e], { type: "text/html" }), n = URL.createObjectURL(t);
-      window.open(n, "_blank"), setTimeout(() => URL.revokeObjectURL(n), 1e4);
-    }
-    return (e, t) => (u(), c("div", ne, [
-      o("div", oe, [
-        o("button", {
-          class: "btn",
-          onClick: t[0] || (t[0] = (n) => f("heading"))
-        }, "Heading"),
-        o("button", {
-          class: "btn",
-          onClick: t[1] || (t[1] = (n) => f("paragraph"))
-        }, "Paragraph"),
-        o("button", {
-          class: "btn",
-          onClick: t[2] || (t[2] = (n) => f("image"))
-        }, "Image"),
-        o("button", {
-          class: "btn",
-          onClick: t[3] || (t[3] = (n) => f("button"))
-        }, "Button"),
-        o("button", {
-          class: "btn",
-          onClick: t[4] || (t[4] = (n) => f("divider"))
-        }, "Divider"),
-        o("button", {
-          class: "btn",
-          onClick: t[5] || (t[5] = (n) => f("spacer"))
-        }, "Spacer"),
-        o("button", {
-          class: "btn",
-          onClick: t[6] || (t[6] = (n) => f("columns2"))
-        }, "2 Columns"),
-        t[8] || (t[8] = o("div", { style: { flex: "1" } }, null, -1)),
-        o("button", {
-          class: "btn",
-          onClick: t[7] || (t[7] = (n) => a("update:modelValue", []))
-        }, "Clear"),
-        o("button", {
-          class: "btn primary",
-          onClick: K
-        }, "Export HTML")
-      ]),
-      o("div", ae, [
-        o("section", ie, [
-          t[9] || (t[9] = o("h3", null, "Blocks", -1)),
-          o("div", se, [
-            (u(!0), c(I, null, B(Q(w), (n, s) => (u(), c("div", {
-              key: s,
-              class: "block",
-              draggable: "",
-              onDragstart: (d) => T(s, d)
-            }, k(n.label), 41, re))), 128))
-          ])
+    return (t, e) => {
+      var r;
+      return p(), c("div", te, [
+        l("div", ne, [
+          l("button", {
+            class: "btn",
+            onClick: e[0] || (e[0] = (o) => b("heading"))
+          }, "Heading"),
+          l("button", {
+            class: "btn",
+            onClick: e[1] || (e[1] = (o) => b("paragraph"))
+          }, "Paragraph"),
+          l("button", {
+            class: "btn",
+            onClick: e[2] || (e[2] = (o) => b("image"))
+          }, "Image"),
+          l("button", {
+            class: "btn",
+            onClick: e[3] || (e[3] = (o) => b("button"))
+          }, "Button"),
+          l("button", {
+            class: "btn",
+            onClick: e[4] || (e[4] = (o) => b("divider"))
+          }, "Divider"),
+          l("button", {
+            class: "btn",
+            onClick: e[5] || (e[5] = (o) => b("spacer"))
+          }, "Spacer"),
+          l("button", {
+            class: "btn",
+            onClick: e[6] || (e[6] = (o) => b("columns2"))
+          }, "2 Columns"),
+          e[10] || (e[10] = l("div", { style: { flex: "1" } }, null, -1)),
+          l("button", {
+            class: "btn",
+            onClick: e[7] || (e[7] = (o) => a("update:modelValue", []))
+          }, "Clear"),
+          l("button", {
+            class: "btn primary",
+            onClick: F
+          }, "Export HTML")
         ]),
-        o("section", de, [
-          t[10] || (t[10] = o("h3", null, "Canvas", -1)),
-          o("div", pe, [
-            o("div", {
-              class: "dropzone",
-              onDragover: h(O, ["prevent"]),
-              onDrop: h(R, ["prevent"])
-            }, [
-              l.length === 0 ? (u(), c("p", ue, "Drag blocks here… or use the toolbar.")) : A("", !0),
-              (u(!0), c(I, null, B(l, (n, s) => (u(), c("div", {
-                key: n.id,
-                class: X(["block", { dragging: y.value === n.id }]),
-                draggable: "",
-                onDragstart: (d) => U(n, d),
-                onDragend: V,
-                onClick: (d) => H(n)
+        l("div", le, [
+          l("section", oe, [
+            e[11] || (e[11] = l("h3", null, "Blocks", -1)),
+            l("div", ae, [
+              (p(!0), c($, null, S(Y(T), (o, d) => (p(), c("div", {
+                key: d,
+                class: "block",
+                draggable: "true",
+                onDragstart: (g) => V(d, g)
+              }, D(o.label), 41, ie))), 128))
+            ])
+          ]),
+          l("section", re, [
+            e[13] || (e[13] = l("h3", null, "Canvas", -1)),
+            l("div", se, [
+              l("div", {
+                class: "dropzone",
+                onDragover: f(U, ["stop", "prevent"]),
+                onDrop: f(H, ["stop", "prevent"]),
+                onDragenter: e[9] || (e[9] = f(() => {
+                }, ["stop", "prevent"])),
+                onDragleave: E
               }, [
-                o("strong", me, k(E(n.type)), 1),
-                o("small", ge, k(j(n)), 1),
-                o("div", ve, [
-                  o("button", {
-                    class: "btn",
-                    onClick: h((d) => D(s, -1), ["stop"]),
-                    disabled: s === 0
-                  }, "↑", 8, fe),
-                  o("button", {
-                    class: "btn",
-                    onClick: h((d) => D(s, 1), ["stop"]),
-                    disabled: s === l.length - 1
-                  }, "↓", 8, ye),
-                  o("button", {
-                    class: "btn",
-                    onClick: h((d) => S(s), ["stop"])
-                  }, "✕", 8, he)
-                ])
-              ], 42, ce))), 128)),
-              v.value !== -1 ? (u(), c("div", xe)) : A("", !0)
-            ], 32)
+                n.length === 0 ? (p(), c($, { key: 0 }, [
+                  e[12] || (e[12] = l("p", { style: { opacity: ".7" } }, "Drag blocks here… or use the toolbar.", -1)),
+                  m.value === 0 ? (p(), c("div", de)) : C("", !0)
+                ], 64)) : C("", !0),
+                (p(!0), c($, null, S(n, (o, d) => (p(), c($, {
+                  key: o.id
+                }, [
+                  m.value === d ? (p(), c("div", pe)) : C("", !0),
+                  l("div", {
+                    class: G(["block", { dragging: y.value === o.id }]),
+                    draggable: "true",
+                    onDragstart: (g) => O(o, g),
+                    onDragend: R,
+                    onDragover: f((g) => L(d, g), ["stop", "prevent"]),
+                    onMousedown: f((g) => A(o), ["stop"]),
+                    onClick: (g) => A(o)
+                  }, [
+                    l("strong", ce, D(M(o.type)), 1),
+                    l("small", me, D(z(o)), 1),
+                    l("div", {
+                      class: "controls",
+                      onMousedown: e[8] || (e[8] = f(() => {
+                      }, ["stop"]))
+                    }, [
+                      l("button", {
+                        class: "btn",
+                        onClick: f((g) => B(d, -1), ["stop"]),
+                        disabled: d === 0
+                      }, "↑", 8, ge),
+                      l("button", {
+                        class: "btn",
+                        onClick: f((g) => B(d, 1), ["stop"]),
+                        disabled: d === n.length - 1
+                      }, "↓", 8, ve),
+                      l("button", {
+                        class: "btn",
+                        onClick: f((g) => j(d), ["stop"])
+                      }, "✕", 8, fe)
+                    ], 32)
+                  ], 42, ue)
+                ], 64))), 128)),
+                n.length && m.value === n.length ? (p(), c("div", xe)) : C("", !0)
+              ], 32)
+            ])
+          ]),
+          l("section", be, [
+            e[15] || (e[15] = l("h3", null, "Inspector", -1)),
+            h.value ? (p(), c("div", ye, [
+              (p(), K(Z(N[(r = h.value) == null ? void 0 : r.type] || P), {
+                model: h.value,
+                onUpdate: q
+              }, null, 40, ["model"]))
+            ])) : (p(), c("div", he, [...e[14] || (e[14] = [
+              l("p", { style: { opacity: ".7" } }, "Select a block to edit its properties.", -1)
+            ])]))
           ])
-        ]),
-        o("section", $e, [
-          t[12] || (t[12] = o("h3", null, "Inspector", -1)),
-          x.value ? (u(), c("div", ke, [
-            (u(), ee(te(q(x.value)), {
-              model: x.value,
-              onUpdate: G
-            }, null, 40, ["model"]))
-          ])) : (u(), c("div", be, [...t[11] || (t[11] = [
-            o("p", { style: { opacity: ".7" } }, "Select a block to edit its properties.", -1)
-          ])]))
         ])
-      ])
-    ]));
+      ]);
+    };
   }
 };
 export {
-  we as EmailBuilder
+  Ae as EmailBuilder
 };
